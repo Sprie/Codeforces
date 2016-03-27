@@ -1,4 +1,4 @@
-package com.axic.codeforces;
+package com.axic.codeforces.method;
 
 import android.app.DownloadManager;
 

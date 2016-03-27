@@ -1,4 +1,4 @@
-package com.axic.codeforces;
+package com.axic.codeforces.data;
 
 import java.util.List;
 
