@@ -39,11 +39,11 @@ public class Problems extends Fragment implements SwipeRefreshLayout.OnRefreshLi
 
     private View view;
     //    View mainView;
-    RequestQueue mQueue;
-    String ProblemUrl = "http://codeforces.com/api/contest.standings";
-    ListView listView;
-    String contestId;
-    String url;
+    private RequestQueue mQueue;
+    private String ProblemUrl = "http://codeforces.com/api/contest.standings";
+    private ListView listView;
+    private String contestId;
+    private String url;
     private SwipeRefreshLayout mSwipe;
     boolean dbstatus = true;//第一次运行加入数据库，刷新获取新数据进行比较，不同则更新数据
 
