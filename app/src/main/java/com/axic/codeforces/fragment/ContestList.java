@@ -45,7 +45,7 @@ public class ContestList extends Fragment implements SwipeRefreshLayout.OnRefres
     boolean status = true;//第一次运行从net获取数据，之后从数据库获取；
     boolean dbstatus = true;//第一次运行加入数据库，刷新获取新数据进行比较，不同则更新数据
 
-    private CheckNet checkNet;
+    private CheckNet CheckNet;
 
 
     ArrayList<HashMap<String, String>> list = new ArrayList<HashMap<String, String>>();
@@ -56,7 +56,7 @@ public class ContestList extends Fragment implements SwipeRefreshLayout.OnRefres
         view = inflater.inflate(R.layout.contentfragment, container, false);
 //        view = getPersistentView(inflater, container, savedInstanceState);
         db = new ContestDBManager(getActivity(), 1);
-        checkNet = new CheckNet(getActivity());
+        CheckNet = new CheckNet(getActivity());
 
         listView = (ListView) view.findViewById(R.id.contentListview);
 
@@ -133,11 +133,11 @@ public class ContestList extends Fragment implements SwipeRefreshLayout.OnRefres
 //    }
 
     public void onRefresh() {
-        if (checkNet.haveNet()) {
+        if (CheckNet.haveNet()) {
 //            list.clear();
-
+            //重新从网络获取数据，并动态设置刷新圈的显示与结束
             getDataFromNet();
-            mSwipeLayout.setRefreshing(false);
+//            mSwipeLayout.setRefreshing(false);
         } else {
             Toast.makeText(getActivity(), "当前无网络", Toast.LENGTH_LONG).show();
             getDataFromDB();
@@ -148,6 +148,7 @@ public class ContestList extends Fragment implements SwipeRefreshLayout.OnRefres
     public void getDataFromNet() {
 
         mQueue = Volley.newRequestQueue(getActivity());
+        Log.d("getData","开始获取数据");
 
 
         GsonRequest<contestFalse> GsonRequest = new GsonRequest<contestFalse>(
@@ -160,6 +161,8 @@ public class ContestList extends Fragment implements SwipeRefreshLayout.OnRefres
                         //若获取的列表size比数据库中的多，则更新数据库
                         //若比赛的phase改变也许要更新数据库
                         int dataSize = db.getDataFromDB().size();
+                        Log.d("datasize",dataSize+"");
+                        Log.d("ctListSize",ctList.size()+"");
                         if (ctList.size() > dataSize) {
 //                                dbstatus = true;
                             Log.d("news", "新数据");
@@ -183,7 +186,7 @@ public class ContestList extends Fragment implements SwipeRefreshLayout.OnRefres
                                     new String[]{"name", "id", "phase"}, new int[]{R.id.contestName, R.id.contestId, R.id.contestPhase});
 
                             listView.setAdapter(listAdapter);
-                            Log.d("getData","FromNet");
+                            Log.d("getData", "FromNet");
 
                             //若不是第一次创建数据库，且数据有更新，则将更新的数据add到数据库
                             if (!dbstatus) {
@@ -191,7 +194,7 @@ public class ContestList extends Fragment implements SwipeRefreshLayout.OnRefres
                                 contestFalse.ResultBean newResult = new contestFalse.ResultBean();
                                 List<contestFalse.ResultBean> newData = new ArrayList<contestFalse.ResultBean>();
                                 //获取更新的数据
-                                for (dataSize++; dataSize <= ctList.size(); dataSize++) {
+                                for (int i = 0; i <= 20; i++) {
                                     String name = ctList.get(dataSize).getName();
                                     String id = ctList.get(dataSize).getId();
                                     String phase = ctList.get(dataSize).getPhase();
@@ -204,8 +207,8 @@ public class ContestList extends Fragment implements SwipeRefreshLayout.OnRefres
 
                                     newData.add(newResult);
                                 }
-                                db.add(newData);
-
+                                db.updateList(newData);
+                                Log.d("updateList", "update");
 
                             }
 
@@ -234,7 +237,7 @@ public class ContestList extends Fragment implements SwipeRefreshLayout.OnRefres
 //                                    Log.d("phase",db.getPhaseById(id));
                                     dataStatue = true;
 
-                                }else{
+                                } else {
                                     dataStatue = false;
                                 }
 
@@ -246,25 +249,31 @@ public class ContestList extends Fragment implements SwipeRefreshLayout.OnRefres
                             getDataFromDB();
 
 
-                            if(dataStatue){
-                                Toast.makeText(getActivity(),"数据已更新",Toast.LENGTH_SHORT).show();
-                            }else{
-                                Toast.makeText(getActivity(),"数据已是最新",Toast.LENGTH_SHORT).show();
+                            if (dataStatue) {
+                                Toast.makeText(getActivity(), "数据已更新", Toast.LENGTH_SHORT).show();
+                            } else {
+                                Toast.makeText(getActivity(), "数据已是最新", Toast.LENGTH_SHORT).show();
                             }
                         }
+                        //结束刷新圈的显示
+                        mSwipeLayout.setRefreshing(false);
 
                     }
                 }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
                 Log.e("TErr", error.getMessage(), error);
+                Toast.makeText(getActivity(),"服务器正在开小差~请稍候重试 >-<",Toast.LENGTH_LONG).show();
+                mSwipeLayout.setRefreshing(false);
             }
         });
         //设置请求的超时时间和重连次数
         GsonRequest.setRetryPolicy(new DefaultRetryPolicy(
-                5000,
-                2,
-                2
+                5000,//Timeout - Specifies Socket Timeout in millis per every retry attempt.
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,//Number Of Retries - Number of times retry is attempted.
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT
+                //Back Off Multiplier -
+                // A multiplier which is used to determine exponential(指数的) time set to socket for every retry attempt.
         ));
         mQueue.add(GsonRequest);
 

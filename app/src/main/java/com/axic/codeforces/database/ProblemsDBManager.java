@@ -6,8 +6,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
 import com.axic.codeforces.data.ProblemsIndex;
-import com.axic.codeforces.data.contestFalse;
-import com.axic.codeforces.fragment.Problems;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -95,6 +93,7 @@ public class ProblemsDBManager {
             db.setTransactionSuccessful();//设置事务成功完成
         } finally {
             db.endTransaction();//完成事务
+            Log.d("adddatatodb", "added");
         }
     }
 
@@ -119,7 +118,7 @@ public class ProblemsDBManager {
         db.beginTransaction();//开始事务
         try {
             Cursor c = db.rawQuery("SELECT * FROM problems " +
-                    "WHERE id = ? AND proIndex = ?" , new String[]{contestId,proIndex});
+                    "WHERE id = ? AND proIndex = ?", new String[]{contestId, proIndex});
 //        int tag = c.getCount();
 
 //        Log.d("cCount", c.getCount() + "");

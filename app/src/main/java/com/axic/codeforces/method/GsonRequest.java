@@ -1,6 +1,7 @@
 package com.axic.codeforces.method;
 
-import android.app.DownloadManager;
+
+import android.util.Log;
 
 import com.android.volley.NetworkResponse;
 import com.android.volley.ParseError;
@@ -38,11 +39,13 @@ public class GsonRequest<T> extends Request<T> {
     @Override
     protected Response<T> parseNetworkResponse(NetworkResponse response){
         try {
+            Log.d("response","success");
             String jsonString = new String(response.data,
                     HttpHeaderParser.parseCharset(response.headers));
             return Response.success(mGson.fromJson(jsonString, mClass),
                     HttpHeaderParser.parseCacheHeaders(response));
         } catch (UnsupportedEncodingException e) {
+            Log.d("response","failed");
             return Response.error(new ParseError(e));
         }
     }

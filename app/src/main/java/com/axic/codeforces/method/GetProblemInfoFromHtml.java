@@ -1,9 +1,11 @@
 package com.axic.codeforces.method;
 
 
-import android.text.Html;
+import android.os.Message;
 import android.util.Log;
 
+
+import com.axic.codeforces.fragment.ProblemsDetails;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
@@ -16,18 +18,12 @@ import java.io.IOException;
 /**
  * Created by 59786 on 2016/3/22.
  */
-public class GetProblemInfoFromHtml extends Thread {
+public class GetProblemInfoFromHtml {
     Document doc;
 
 
     String html;
     String url;
-
-    public boolean getStatus() {
-        return status;
-    }
-
-    private boolean status = false;
 
 
     public String getHtml() {
@@ -39,15 +35,17 @@ public class GetProblemInfoFromHtml extends Thread {
         this.url = url;
     }
 
-    @Override
-    public void run() {
+    //发生错误返回false
+    public boolean run() {
+
 
         try {
-            doc = Jsoup.connect(url).timeout(8000).get();
+            doc = Jsoup.connect(url).timeout(5000).get();
         } catch (IOException e) {
             e.printStackTrace();
+            return false;
         }
-        if(doc != null) {
+        if (doc != null) {
             //获取problem全部数据；
             Elements HTML = doc.select("div.problem-statement");
 
@@ -63,11 +61,12 @@ public class GetProblemInfoFromHtml extends Thread {
                 //若HTML文本中有图片链接，获取该图片
 
             }
-            status = true;
-        }else {
+
+
+        } else {
             html = "Error";
         }
-
+        return true;
 
     }
 

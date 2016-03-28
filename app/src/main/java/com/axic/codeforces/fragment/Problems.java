@@ -2,8 +2,6 @@ package com.axic.codeforces.fragment;
 
 import android.app.Activity;
 import android.app.Fragment;
-import android.app.FragmentTransaction;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
@@ -23,7 +21,6 @@ import com.android.volley.VolleyError;
 import com.android.volley.toolbox.Volley;
 import com.axic.codeforces.R;
 import com.axic.codeforces.data.ProblemsIndex;
-import com.axic.codeforces.data.contestFalse;
 import com.axic.codeforces.database.ProblemsDBManager;
 import com.axic.codeforces.method.CheckNet;
 import com.axic.codeforces.method.GsonRequest;
@@ -50,7 +47,7 @@ public class Problems extends Fragment implements SwipeRefreshLayout.OnRefreshLi
     private ProblemsDBManager db;
 
     TextView tv;
-    private CheckNet checkNet;
+    private CheckNet CheckNet;
 
     private Callbacks mCallbacks;
 
@@ -72,7 +69,7 @@ public class Problems extends Fragment implements SwipeRefreshLayout.OnRefreshLi
         super.onCreate(savedInstanceState);
 
         db = new ProblemsDBManager(getActivity(), 1);
-        checkNet = new CheckNet(getActivity());
+        CheckNet = new CheckNet(getActivity());
 
         //获取Activity传来的数据
         final Bundle bundle = getArguments();
@@ -102,9 +99,15 @@ public class Problems extends Fragment implements SwipeRefreshLayout.OnRefreshLi
         tv = (TextView) view.findViewById(R.id.contest_id);
 
         tv.setText(url);
+        if (db.getDataFromDBById(contestId) == null) {
+            getDataFromNet();
+        } else {
 
-        getDataFromNet();
-
+            //获取数据库数据并显示
+            Log.d("nonewdata", "nonewdata");
+            Log.d("getData", "FromDB");
+            getDataFromDB();
+        }
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -135,11 +138,11 @@ public class Problems extends Fragment implements SwipeRefreshLayout.OnRefreshLi
 //        } else {
 //            getDataFromDB();
 //        }
-        if (checkNet.haveNet()) {
+        if (CheckNet.haveNet()) {
 //            list.clear();
 
             getDataFromNet();
-            mSwipe.setRefreshing(false);
+//            mSwipe.setRefreshing(false);
         } else {
             Toast.makeText(getActivity(), "当前无网络", Toast.LENGTH_LONG).show();
             getDataFromDB();
@@ -192,65 +195,63 @@ public class Problems extends Fragment implements SwipeRefreshLayout.OnRefreshLi
 
                         //
 //                        int dataSize = db.getDataFromDBById().size();
-                        if (db.getDataFromDBById(contestId) == null) {
-                                dbstatus = true;
-                            Log.d("news", "新数据");
+
+                        dbstatus = true;
+                        Log.d("news", "新数据");
 //                        list.clear();
-                            for (ProblemsIndex.ResultBean.ProblemsBean rst : ctList) {
-                                String index = rst.getIndex();
-                                String name = rst.getName();
-                                String type = rst.getType();
-                                String points = rst.getPoints();
-                                String tags;
+                        for (ProblemsIndex.ResultBean.ProblemsBean rst : ctList) {
+                            String index = rst.getIndex();
+                            String name = rst.getName();
+                            String type = rst.getType();
+                            String points = rst.getPoints();
+                            String tags;
 
-                                List<String> tag = rst.getTags();
-                                if (tag.size() > 0) {
-                                    tags = tag.get(0);
-                                    for (int i = 1; i < tag.size(); i++) {
-                                        tags = tags + "、" + tag.get(i);
-                                    }
-                                } else {
-                                    tags = "null";
+                            List<String> tag = rst.getTags();
+                            if (tag.size() > 0) {
+                                tags = tag.get(0);
+                                for (int i = 1; i < tag.size(); i++) {
+                                    tags = tags + "、" + tag.get(i);
                                 }
-                                HashMap<String, String> map = new HashMap<String, String>();
-                                map.put("name", name);
-                                map.put("index", index);
-                                map.put("tags", tags);
-
-                                list.add(map);
+                            } else {
+                                tags = "null";
                             }
-                            SimpleAdapter listAdapter = new SimpleAdapter(getActivity(), list, R.layout.poblemslistview,
-                                    new String[]{"name", "index", "tags"},
-                                    new int[]{R.id.problemName, R.id.problemIndex, R.id.problemTags});
+                            HashMap<String, String> map = new HashMap<String, String>();
+                            map.put("name", name);
+                            map.put("index", index);
+                            map.put("tags", tags);
 
-                            listView.setAdapter(listAdapter);
-
-                            if (dbstatus) {
-                                //添加数据到数据库
-                                db.add(ctList);
-                                dbstatus = false;
-                                Log.d("adddatatodb", "added");
-                            }
-                        } else {
-
-                            //获取数据库数据并显示
-                            Log.d("nonewdata", "nonewdata");
-                            Log.d("getData", "FromDB");
-                            getDataFromDB();
+                            list.add(map);
                         }
+                        SimpleAdapter listAdapter = new SimpleAdapter(getActivity(), list, R.layout.poblemslistview,
+                                new String[]{"name", "index", "tags"},
+                                new int[]{R.id.problemName, R.id.problemIndex, R.id.problemTags});
+
+                        listView.setAdapter(listAdapter);
+
+                        if (dbstatus) {
+                            //添加数据到数据库
+                            db.add(ctList);
+                            dbstatus = false;
+
+                        }
+
+                        Toast.makeText(getActivity(), "刷新成功", Toast.LENGTH_LONG).show();
+                        mSwipe.setRefreshing(false);
 
                     }
                 }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
                 Log.e("TErr", error.getMessage(), error);
+                Toast.makeText(getActivity(), "服务器正在开小差~请稍候重试 >-<", Toast.LENGTH_LONG).show();
+                mSwipe.setRefreshing(false);
             }
         });
 
         GsonRequest.setRetryPolicy(new DefaultRetryPolicy(
                 5000,
-                2,
-                2
+                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT
         ));
 
         mQueue.add(GsonRequest);

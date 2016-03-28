@@ -15,7 +15,6 @@ import com.android.volley.RequestQueue;
 
 import com.axic.codeforces.fragment.ContestList;
 import com.axic.codeforces.fragment.Home;
-import com.axic.codeforces.fragment.Problems;
 import com.axic.codeforces.method.GetProblemInfoFromHtml;
 import com.axic.codeforces.R;
 import com.google.gson.Gson;

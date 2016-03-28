@@ -6,7 +6,6 @@ import android.database.sqlite.SQLiteDatabase;
 import android.util.Log;
 
 import com.axic.codeforces.data.contestFalse;
-import com.axic.codeforces.database.contestDBHelper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -42,12 +41,41 @@ public class ContestDBManager {
         }
     }
 
+    //更新列表
+    public void updateList(List<contestFalse.ResultBean> contests) {
+
+        db.beginTransaction();//开始事务
+        try {
+            for (contestFalse.ResultBean contest : contests) {
+                Cursor cursor;
+                cursor = db.rawQuery("SELECT id FROM contestFalse " +
+                                "where id  = ?",
+                        new String[]{contest.getId()});
+                if (cursor.getCount() == 0) {
+                    db.execSQL("INSERT INTO contestFalse VALUES(?,?,?,?)",
+                            new String[]{contest.getId(),
+                                    contest.getName(),
+                                    contest.getType(),
+                                    contest.getPhase()});
+
+                    Log.d("update","News");
+                } else {
+
+                    Log.d("uadate","noNews");
+                }
+            }
+            db.setTransactionSuccessful();//设置事务成功完成
+        } finally {
+            db.endTransaction();//完成事务
+        }
+    }
+
     public List<contestFalse.ResultBean> getDataFromDB() {
         ArrayList<contestFalse.ResultBean> contests = new ArrayList<contestFalse.ResultBean>();
         Cursor c = queryTheCursor();
-        while(c.moveToNext()){
+        while (c.moveToNext()) {
             contestFalse.ResultBean contest = new contestFalse.ResultBean();
-            contest.setId(c.getString(c.getColumnIndex("id"))) ;
+            contest.setId(c.getString(c.getColumnIndex("id")));
             contest.setName(c.getString(c.getColumnIndex("name")));
             contest.setType(c.getString(c.getColumnIndex("type")));
             contest.setPhase(c.getString(c.getColumnIndex("phase")));
@@ -58,15 +86,16 @@ public class ContestDBManager {
         return contests;
 
     }
+
     //更新Phase的值
-    public void updatePhase(String id,String phase){
+    public void updatePhase(String id, String phase) {
         db.beginTransaction();//开始事务
         try {
 //            for (contestFalse.ResultBean contest : contests) {
-                db.execSQL("UPDATE contestFalse "+
-                        "SET phase = ? "+
-                        "where id  = ?",
-                        new String[]{phase,id});
+            db.execSQL("UPDATE contestFalse " +
+                            "SET phase = ? " +
+                            "where id  = ?",
+                    new String[]{phase, id});
 //            }
             db.setTransactionSuccessful();//设置事务成功完成
         } finally {
@@ -74,16 +103,17 @@ public class ContestDBManager {
         }
 
     }
+
     //根据id搜索phase值
-    public String getPhaseById(String id){
+    public String getPhaseById(String id) {
         Cursor cursor;
         db.beginTransaction();//开始事务
         try {
 
-            cursor  = db.rawQuery("SELECT phase FROM contestFalse "+
+            cursor = db.rawQuery("SELECT phase FROM contestFalse " +
 //                                "SET phase = ? "+
-                                "where id  = ?",
-                        new String[]{id});
+                            "where id  = ?",
+                    new String[]{id});
 
             db.setTransactionSuccessful();//设置事务成功完成
         } finally {
@@ -93,8 +123,8 @@ public class ContestDBManager {
         return cursor.getString(0);
     }
 
-    public Cursor queryTheCursor(){
-        Cursor c = db.rawQuery("SELECT *FROM contestFalse",null);
+    public Cursor queryTheCursor() {
+        Cursor c = db.rawQuery("SELECT *FROM contestFalse", null);
         return c;
     }
 

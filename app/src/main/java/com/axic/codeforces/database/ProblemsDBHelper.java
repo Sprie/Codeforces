@@ -24,8 +24,8 @@ public class ProblemsDBHelper extends SQLiteOpenHelper {
                 "proIndex VARCHAR,name VARCHAR," +
                 "type VARCHAR,points VARCHAR," +
                 "tags VARCHAR,"+
-                "details TEXT" +
-                "PRIMARY KEY(id,proIndex)" +
+                "details TEXT," +
+                "PRIMARY KEY(id,proIndex)," +
                 "FOREIGN KEY(id) REFERENCES contestFalse(id)" +
                 ")");
         Log.d("db", "数据库创建完成");
