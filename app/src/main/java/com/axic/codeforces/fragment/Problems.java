@@ -42,7 +42,7 @@ public class Problems extends Fragment implements SwipeRefreshLayout.OnRefreshLi
     private String contestId;
     private String url;
     private SwipeRefreshLayout mSwipe;
-    boolean dbstatus = true;//第一次运行加入数据库，刷新获取新数据进行比较，不同则更新数据
+    boolean dbstatus = true;//查看数据库是否有该contest的problems列表，
 
     private ProblemsDBManager db;
 
@@ -99,15 +99,17 @@ public class Problems extends Fragment implements SwipeRefreshLayout.OnRefreshLi
         tv = (TextView) view.findViewById(R.id.contest_id);
 
         tv.setText(url);
-        if (db.getDataFromDBById(contestId) == null) {
-            getDataFromNet();
-        } else {
+//        if (db.getDataFromDBById(contestId) == null) {
+//            getDataFromNet();
+//        } else {
+//
+//            //获取数据库数据并显示
+//            Log.d("nonewdata", "nonewdata");
+//            Log.d("getData", "FromDB");
+//            getDataFromDB();
+//        }
 
-            //获取数据库数据并显示
-            Log.d("nonewdata", "nonewdata");
-            Log.d("getData", "FromDB");
-            getDataFromDB();
-        }
+        getDataFromNet();
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -183,78 +185,90 @@ public class Problems extends Fragment implements SwipeRefreshLayout.OnRefreshLi
     }
 
     private void getDataFromNet() {
+//        if (db.getDataFromDBById(contestId) == null) {
+//            getDataFromNet();
+//        } else {
+//
+//            //获取数据库数据并显示
+//            Log.d("nonewdata", "nonewdata");
+//            Log.d("getData", "FromDB");
+//            getDataFromDB();
+//        }
+        if (db.getDataFromDBById(contestId) == null) {
 
+            //从传来的url联网获取数据
+            GsonRequest<ProblemsIndex> GsonRequest = new GsonRequest<ProblemsIndex>(
+                    url, ProblemsIndex.class,
+                    new Response.Listener<ProblemsIndex>() {
+                        @Override
+                        public void onResponse(ProblemsIndex mProblem) {
+                            List<ProblemsIndex.ResultBean.ProblemsBean> ctList = mProblem.getResult().getProblems();
 
-        //从传来的url联网获取数据
-        GsonRequest<ProblemsIndex> GsonRequest = new GsonRequest<ProblemsIndex>(
-                url, ProblemsIndex.class,
-                new Response.Listener<ProblemsIndex>() {
-                    @Override
-                    public void onResponse(ProblemsIndex mProblem) {
-                        List<ProblemsIndex.ResultBean.ProblemsBean> ctList = mProblem.getResult().getProblems();
-
-                        //
+                            //
 //                        int dataSize = db.getDataFromDBById().size();
 
-                        dbstatus = true;
-                        Log.d("news", "新数据");
+                            dbstatus = true;
+                            Log.d("news", "新数据");
 //                        list.clear();
-                        for (ProblemsIndex.ResultBean.ProblemsBean rst : ctList) {
-                            String index = rst.getIndex();
-                            String name = rst.getName();
-                            String type = rst.getType();
-                            String points = rst.getPoints();
-                            String tags;
+                            for (ProblemsIndex.ResultBean.ProblemsBean rst : ctList) {
+                                String index = rst.getIndex();
+                                String name = rst.getName();
+                                String type = rst.getType();
+                                String points = rst.getPoints();
+                                String tags;
 
-                            List<String> tag = rst.getTags();
-                            if (tag.size() > 0) {
-                                tags = tag.get(0);
-                                for (int i = 1; i < tag.size(); i++) {
-                                    tags = tags + "、" + tag.get(i);
+                                List<String> tag = rst.getTags();
+                                if (tag.size() > 0) {
+                                    tags = tag.get(0);
+                                    for (int i = 1; i < tag.size(); i++) {
+                                        tags = tags + "、" + tag.get(i);
+                                    }
+                                } else {
+                                    tags = "null";
                                 }
-                            } else {
-                                tags = "null";
+                                HashMap<String, String> map = new HashMap<String, String>();
+                                map.put("name", name);
+                                map.put("index", index);
+                                map.put("tags", tags);
+
+                                list.add(map);
                             }
-                            HashMap<String, String> map = new HashMap<String, String>();
-                            map.put("name", name);
-                            map.put("index", index);
-                            map.put("tags", tags);
+                            SimpleAdapter listAdapter = new SimpleAdapter(getActivity(), list, R.layout.poblemslistview,
+                                    new String[]{"name", "index", "tags"},
+                                    new int[]{R.id.problemName, R.id.problemIndex, R.id.problemTags});
 
-                            list.add(map);
-                        }
-                        SimpleAdapter listAdapter = new SimpleAdapter(getActivity(), list, R.layout.poblemslistview,
-                                new String[]{"name", "index", "tags"},
-                                new int[]{R.id.problemName, R.id.problemIndex, R.id.problemTags});
+                            listView.setAdapter(listAdapter);
 
-                        listView.setAdapter(listAdapter);
+                            if (dbstatus) {
+                                //添加数据到数据库
+                                db.add(ctList);
+                                dbstatus = false;
 
-                        if (dbstatus) {
-                            //添加数据到数据库
-                            db.add(ctList);
-                            dbstatus = false;
+                            }
+
+                            mSwipe.setRefreshing(false);
 
                         }
+                    }, new Response.ErrorListener() {
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    Log.e("TErr", error.getMessage(), error);
+                    Toast.makeText(getActivity(), "服务器正在开小差~请稍候重试 >-<", Toast.LENGTH_LONG).show();
+                    mSwipe.setRefreshing(false);
+                }
+            });
 
-                        Toast.makeText(getActivity(), "刷新成功", Toast.LENGTH_LONG).show();
-                        mSwipe.setRefreshing(false);
+            GsonRequest.setRetryPolicy(new DefaultRetryPolicy(
+                    5000,
+                    DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
+                    DefaultRetryPolicy.DEFAULT_BACKOFF_MULT
+            ));
 
-                    }
-                }, new Response.ErrorListener() {
-            @Override
-            public void onErrorResponse(VolleyError error) {
-                Log.e("TErr", error.getMessage(), error);
-                Toast.makeText(getActivity(), "服务器正在开小差~请稍候重试 >-<", Toast.LENGTH_LONG).show();
-                mSwipe.setRefreshing(false);
-            }
-        });
-
-        GsonRequest.setRetryPolicy(new DefaultRetryPolicy(
-                5000,
-                DefaultRetryPolicy.DEFAULT_MAX_RETRIES,
-                DefaultRetryPolicy.DEFAULT_BACKOFF_MULT
-        ));
-
-        mQueue.add(GsonRequest);
+            mQueue.add(GsonRequest);
+        } else {
+            getDataFromDB();
+            mSwipe.setRefreshing(false);
+        }
     }
 
     public void onDestroy() {

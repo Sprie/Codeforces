@@ -106,7 +106,7 @@ public class ProblemsDBManager {
                             "WHERE id = ? " +
                             "AND proIndex = ?",
                     new String[]{problemsDetails, contestId, proIndex});
-
+            Log.d("addDetailtoDb", "true");
             db.setTransactionSuccessful();//设置事务成功完成
         } finally {
             db.endTransaction();//完成事务
@@ -121,12 +121,15 @@ public class ProblemsDBManager {
                     "WHERE id = ? AND proIndex = ?", new String[]{contestId, proIndex});
 //        int tag = c.getCount();
 
-//        Log.d("cCount", c.getCount() + "");
-//        if (tag != 0) {
-            while (c.moveToNext()) {
-                details = c.getString(c.getColumnIndex("details"));
 
-            }
+//        if (tag != 0) {
+//            while (c.moveToNext()) {
+            c.moveToNext();
+            Log.d("cCount", c.getCount() + c.getString(c.getColumnIndex("details")));
+
+                details = c.getString(c.getColumnIndex("details"));
+                Log.d("getfromdb", details+"null");
+//            }
             c.close();
 
             db.setTransactionSuccessful();//设置事务成功完成

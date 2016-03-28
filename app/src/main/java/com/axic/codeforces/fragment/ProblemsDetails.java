@@ -32,7 +32,6 @@ public class ProblemsDetails extends Fragment implements SwipeRefreshLayout.OnRe
     private String Url;
     private SwipeRefreshLayout mSwipe;
     private CheckNet checkNet;
-    private String problemsDetails;
     private ProblemsDBManager db;
     private GetProblemInfoFromHtml getProblemInfoFromHtml;
     String html = "error";
@@ -60,7 +59,7 @@ public class ProblemsDetails extends Fragment implements SwipeRefreshLayout.OnRe
         mSwipe = (SwipeRefreshLayout) view.findViewById(R.id.details_swipe);
         mSwipe.setOnRefreshListener(this);
         checkNet = new CheckNet(getActivity());
-        getProblemInfoFromHtml = new GetProblemInfoFromHtml(problemUrl);
+
         tv.setText("Loading...");
 
         Bundle bundle = getArguments();
@@ -74,6 +73,7 @@ public class ProblemsDetails extends Fragment implements SwipeRefreshLayout.OnRe
         } else {
             tv.setText("error");
         }
+        getProblemInfoFromHtml = new GetProblemInfoFromHtml(Url);
 
         getDataFromNet();
 
@@ -127,7 +127,7 @@ public class ProblemsDetails extends Fragment implements SwipeRefreshLayout.OnRe
                         });
 
                         //向数据库添加数据
-                        db.addDetail(problemsDetails, contestId, index);
+                        db.addDetail(html, contestId, index);
                     } else {
                         Log.d("status", status + "--");
                         getActivity().runOnUiThread(new Runnable() {

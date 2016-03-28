@@ -40,7 +40,8 @@ public class GetProblemInfoFromHtml {
 
 
         try {
-            doc = Jsoup.connect(url).timeout(5000).get();
+            doc = Jsoup.connect(url).timeout(8000).get();
+            Log.d("url", url);
         } catch (IOException e) {
             e.printStackTrace();
             return false;

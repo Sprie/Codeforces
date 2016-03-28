@@ -3,7 +3,8 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#fff"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    >
 
     <TextView
         android:id="@+id/tv"
@@ -24,10 +25,11 @@
             android:gravity="center">
 
             <TextView
+                android:id="@+id/tv_home"
                 android:layout_width="match_parent"
                 android:layout_height="55dp"
                 android:gravity="center"
-                android:text="home"
+                android:text="HOME"
                 android:textColor="#111" />
         </LinearLayout>
 
@@ -38,10 +40,11 @@
             android:layout_weight="1">
 
             <TextView
+                android:id="@+id/tv_contest"
                 android:layout_width="match_parent"
                 android:layout_height="55dp"
                 android:gravity="center"
-                android:text="contestList"
+                android:text="CONTEST"
                 android:textColor="#111" />
         </LinearLayout>
 
@@ -52,10 +55,11 @@
             android:layout_weight="1">
 
             <TextView
+                android:id="@+id/tv_set"
                 android:layout_width="match_parent"
                 android:layout_height="55dp"
                 android:gravity="center"
-                android:text="set"
+                android:text="SET"
                 android:textColor="#111" />
         </LinearLayout>
     </LinearLayout>

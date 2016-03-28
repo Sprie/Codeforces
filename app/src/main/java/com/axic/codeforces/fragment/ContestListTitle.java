@@ -28,7 +28,7 @@ public class ContestListTitle extends Fragment {
             public void onClick(View v){
                 //标题图片点击事件
                 Toast.makeText(getActivity(),
-                        "i am an ImageButton in TitleFragment!",
+                        "I am a search button!",
                         Toast.LENGTH_LONG).show();
             }
         });
