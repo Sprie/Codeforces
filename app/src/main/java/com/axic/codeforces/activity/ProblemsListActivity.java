@@ -29,18 +29,20 @@ public class ProblemsListActivity extends Activity
         //获取上个活动传来的数据
         Intent intent = getIntent();
         String contestId = intent.getStringExtra("contestId");
+        String contestName = intent.getStringExtra("contestName");
         //向Fragment传递数据
         //并设置默认的fragment
-        setDefaultFragment(contestId);
+        setDefaultFragment(contestId,contestName);
 
 
     }
-    private void setDefaultFragment(String contestId) {
+    private void setDefaultFragment(String contestId,String contestName) {
         FragmentManager fm = getFragmentManager();
         FragmentTransaction transaction = fm.beginTransaction();
         mFragment = new Problems();
         Bundle bundle = new Bundle();
         bundle.putString("contestId", contestId);
+        bundle.putString("contestName", contestName);
         mFragment.setArguments(bundle);
         transaction.replace(R.id.problems_content, mFragment, "problems");
 //        transaction.addToBackStack(null);

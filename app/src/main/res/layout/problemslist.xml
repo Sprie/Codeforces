@@ -4,10 +4,34 @@
     android:layout_height="match_parent"
     android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/contest_id"
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:paddingStart="@dimen/problemsListLittleTitlePadding"
+        android:paddingEnd="@dimen/problemsListLittleTitlePadding"
+        android:orientation="horizontal">
+
+        <TextView
+            android:id="@+id/contest_id"
+            android:layout_width="0dp"
+            android:layout_weight="1"
+            android:layout_height="match_parent"
+            android:gravity="center"
+            android:textSize="@dimen/problemsListLittleTitleName" />
+        <TextView
+            android:id="@+id/contest_name"
+            android:layout_width="0dp"
+            android:layout_weight="6"
+            android:layout_height="wrap_content"
+            android:textSize="@dimen/problemsListLittleTitleName"
+            android:ellipsize="end"
+            android:maxLines="1"/>
+    </LinearLayout>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="1px"
+        android:background="#111" />
 
     <android.support.v4.widget.SwipeRefreshLayout
         android:id="@+id/problems_swipe"

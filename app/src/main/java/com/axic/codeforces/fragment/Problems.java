@@ -40,13 +40,16 @@ public class Problems extends Fragment implements SwipeRefreshLayout.OnRefreshLi
     private String ProblemUrl = "http://codeforces.com/api/contest.standings";
     private ListView listView;
     private String contestId;
+    private String contestName;
     private String url;
     private SwipeRefreshLayout mSwipe;
     boolean dbstatus = true;//查看数据库是否有该contest的problems列表，
 
     private ProblemsDBManager db;
+//    private String title;
 
-    TextView tv;
+    private TextView showContestId;
+    private TextView showContestName;
     private CheckNet CheckNet;
 
     private Callbacks mCallbacks;
@@ -75,13 +78,16 @@ public class Problems extends Fragment implements SwipeRefreshLayout.OnRefreshLi
         final Bundle bundle = getArguments();
         if (bundle != null) {
             contestId = bundle.getString("contestId");
+            contestName = bundle.getString("contestName");
         } else {
             contestId = "600";
+            contestName = "Educational Codeforces Round 2";
         }
 
         url = ProblemUrl + "?" + "contestId=" + contestId + "&" +
                 "from=1&count=1&showUnofficial=true";
-
+//        title = contestId + "  " + contestName;
+//        Log.d("title",title);
 
     }
 
@@ -94,20 +100,14 @@ public class Problems extends Fragment implements SwipeRefreshLayout.OnRefreshLi
 
         mSwipe = (SwipeRefreshLayout) view.findViewById(R.id.problems_swipe);
         mSwipe.setOnRefreshListener(this);
-        mSwipe.setColorSchemeResources(android.R.color.holo_red_light);
+        mSwipe.setColorSchemeResources(android.R.color.black);
 
-        tv = (TextView) view.findViewById(R.id.contest_id);
+        showContestId = (TextView) view.findViewById(R.id.contest_id);
+        showContestName = (TextView) view.findViewById(R.id.contest_name);
 
-        tv.setText(url);
-//        if (db.getDataFromDBById(contestId) == null) {
-//            getDataFromNet();
-//        } else {
-//
-//            //获取数据库数据并显示
-//            Log.d("nonewdata", "nonewdata");
-//            Log.d("getData", "FromDB");
-//            getDataFromDB();
-//        }
+
+        showContestName.setText(contestName);
+        showContestId.setText(contestId);
 
         getDataFromNet();
 
@@ -173,12 +173,14 @@ public class Problems extends Fragment implements SwipeRefreshLayout.OnRefreshLi
 //            map.put("points", points);
 //            map.put("type", type);
             map.put("tags", tags);
+            map.put("tag","Tags:");
+
             problemsList.add(map);
         }
 
         SimpleAdapter listAdapter = new SimpleAdapter(getActivity(), problemsList, R.layout.poblemslistview,
-                new String[]{"name", "index", "tags"},
-                new int[]{R.id.problemName, R.id.problemIndex, R.id.problemTags});
+                new String[]{"name", "index", "tags","tag"},
+                new int[]{R.id.problemName, R.id.problemIndex, R.id.problemTags,R.id.Tags});
 
         listView.setAdapter(listAdapter);
         Log.d("right", "right");
@@ -230,12 +232,13 @@ public class Problems extends Fragment implements SwipeRefreshLayout.OnRefreshLi
                                 map.put("name", name);
                                 map.put("index", index);
                                 map.put("tags", tags);
+                                map.put("tag","Tags:");
 
                                 list.add(map);
                             }
                             SimpleAdapter listAdapter = new SimpleAdapter(getActivity(), list, R.layout.poblemslistview,
-                                    new String[]{"name", "index", "tags"},
-                                    new int[]{R.id.problemName, R.id.problemIndex, R.id.problemTags});
+                                    new String[]{"name", "index", "tags","tag"},
+                                    new int[]{R.id.problemName, R.id.problemIndex, R.id.problemTags,R.id.Tags});
 
                             listView.setAdapter(listAdapter);
 

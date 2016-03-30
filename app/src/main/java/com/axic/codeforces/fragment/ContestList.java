@@ -62,7 +62,8 @@ public class ContestList extends Fragment implements SwipeRefreshLayout.OnRefres
 
         mSwipeLayout = (SwipeRefreshLayout) view.findViewById(R.id.swipe);
         mSwipeLayout.setOnRefreshListener(this);
-        mSwipeLayout.setColorSchemeResources(android.R.color.holo_green_dark);
+        mSwipeLayout.setColorSchemeResources(android.R.color.black);
+
         Log.d("start", "startt");
         if (db.helper.dbStatus) {
             getDataFromNet();
@@ -84,10 +85,13 @@ public class ContestList extends Fragment implements SwipeRefreshLayout.OnRefres
                 //获取选中项的数据,传给problemslistActivity
                 HashMap<String, String> map = (HashMap<String, String>) listView.getItemAtPosition(position);
                 String contestId = map.get("id");
+                String contestName = map.get("name");
                 Log.d("getid", contestId);
+                Log.d("getName", contestName);
 
                 Intent mIntent = new Intent(getActivity(), ProblemsListActivity.class);
                 mIntent.putExtra("contestId", contestId);
+                mIntent.putExtra("contestName", contestName);
                 startActivity(mIntent);
             }
         });
@@ -148,7 +152,7 @@ public class ContestList extends Fragment implements SwipeRefreshLayout.OnRefres
     public void getDataFromNet() {
 
         mQueue = Volley.newRequestQueue(getActivity());
-        Log.d("getData","开始获取数据");
+        Log.d("getData", "开始获取数据");
 
 
         GsonRequest<contestFalse> GsonRequest = new GsonRequest<contestFalse>(
@@ -161,8 +165,8 @@ public class ContestList extends Fragment implements SwipeRefreshLayout.OnRefres
                         //若获取的列表size比数据库中的多，则更新数据库
                         //若比赛的phase改变也许要更新数据库
                         int dataSize = db.getDataFromDB().size();
-                        Log.d("datasize",dataSize+"");
-                        Log.d("ctListSize",ctList.size()+"");
+                        Log.d("datasize", dataSize + "");
+                        Log.d("ctListSize", ctList.size() + "");
                         if (ctList.size() > dataSize) {
 //                                dbstatus = true;
                             Log.d("news", "新数据");
@@ -186,19 +190,22 @@ public class ContestList extends Fragment implements SwipeRefreshLayout.OnRefres
                                     new String[]{"name", "id", "phase"}, new int[]{R.id.contestName, R.id.contestId, R.id.contestPhase});
 
                             listView.setAdapter(listAdapter);
-                            Log.d("getData", "FromNet");
+                            Log.d("getContestData", "FromNet");
 
                             //若不是第一次创建数据库，且数据有更新，则将更新的数据add到数据库
                             if (!dbstatus) {
 
                                 contestFalse.ResultBean newResult = new contestFalse.ResultBean();
                                 List<contestFalse.ResultBean> newData = new ArrayList<contestFalse.ResultBean>();
+//                                //标识获取的数据的最大id数
+//                                int maxId = 0;
                                 //获取更新的数据
                                 for (int i = 0; i <= 20; i++) {
                                     String name = ctList.get(dataSize).getName();
                                     String id = ctList.get(dataSize).getId();
                                     String phase = ctList.get(dataSize).getPhase();
                                     String type = ctList.get(dataSize).getType();
+
 
                                     newResult.setName(name);
                                     newResult.setPhase(phase);
@@ -216,43 +223,51 @@ public class ContestList extends Fragment implements SwipeRefreshLayout.OnRefres
                                 //添加数据到数据库
                                 db.add(ctList);
                                 dbstatus = false;
-                                Log.d("adddatatodb", "added");
+                                Log.d("addDataToDB", "added");
                             }
                         } else if (ctList.size() == dataSize) {
                             //判断phase值有没有变化，有变化则更新
-                            contestFalse.ResultBean newResult = new contestFalse.ResultBean();
-                            boolean dataStatue = false;
+                            Log.d("checkPhase", "check");
+//                            contestFalse.ResultBean newResult = new contestFalse.ResultBean();
+//                            boolean dataStatue = false;
+                            int hasChange = 0;
                             //获取服务器数据
                             for (int i = 0; i <= 15; i++) {
+                                //对前15个数据进行查询更新情况
 //                                String name = ctList.get(i).getName();
                                 String id = ctList.get(i).getId();
                                 String phase = ctList.get(i).getPhase();
 //                                String type = ctList.get(i).getType();
                                 //判断是是否与数据库中的phase值相同
                                 //不同则更新
-//                                Log.d("phase","right");
                                 if (!db.getPhaseById(id).equals(phase)) {
+                                    Log.d("checkPhase", "update");
                                     db.updatePhase(id, phase);
 //                                    Log.d("phase",phase);
 //                                    Log.d("phase",db.getPhaseById(id));
-                                    dataStatue = true;
+//                                    if (hasChange == 0) {
+                                    hasChange++;
+//                                    }
+//                                    dataStatue = true;
 
                                 } else {
-                                    dataStatue = false;
+//                                    dataStatue = false;
+                                    Log.d("checkPhase", "noChange");
                                 }
 
 
                             }
                             //获取数据库数据并显示
-                            Log.d("nonewdata", "nonewdata");
-                            Log.d("getData", "FromDB");
+                            Log.d("NewData", "n");
+                            Log.d("getContestDataFromDB", "y");
                             getDataFromDB();
 
 
-                            if (dataStatue) {
-                                Toast.makeText(getActivity(), "数据已更新", Toast.LENGTH_SHORT).show();
-                            } else {
+                            if (hasChange == 0) {
                                 Toast.makeText(getActivity(), "数据已是最新", Toast.LENGTH_SHORT).show();
+                            } else if (hasChange > 0) {
+//                                String str = ;
+                                Toast.makeText(getActivity(), "更新了 " + hasChange + " 条数据", Toast.LENGTH_SHORT).show();
                             }
                         }
                         //结束刷新圈的显示
@@ -263,7 +278,7 @@ public class ContestList extends Fragment implements SwipeRefreshLayout.OnRefres
             @Override
             public void onErrorResponse(VolleyError error) {
                 Log.e("TErr", error.getMessage(), error);
-                Toast.makeText(getActivity(),"服务器正在开小差~请稍候重试 >-<",Toast.LENGTH_LONG).show();
+                Toast.makeText(getActivity(), "服务器正在开小差~请稍候重试 >-<", Toast.LENGTH_LONG).show();
                 mSwipeLayout.setRefreshing(false);
             }
         });

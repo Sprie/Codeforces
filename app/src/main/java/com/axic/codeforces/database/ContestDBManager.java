@@ -58,10 +58,10 @@ public class ContestDBManager {
                                     contest.getType(),
                                     contest.getPhase()});
 
-                    Log.d("update","News");
+                    Log.d("update", "News");
                 } else {
 
-                    Log.d("uadate","noNews");
+                    Log.d("uadate", "noNews");
                 }
             }
             db.setTransactionSuccessful();//设置事务成功完成
@@ -126,6 +126,30 @@ public class ContestDBManager {
     public Cursor queryTheCursor() {
         Cursor c = db.rawQuery("SELECT *FROM contestFalse", null);
         return c;
+    }
+
+    //search
+    //搜索
+    public List<contestFalse.ResultBean> searchIdDataFromDB(String edit) {
+        if (!edit.equals("")) {
+            ArrayList<contestFalse.ResultBean> contests = new ArrayList<contestFalse.ResultBean>();
+            Cursor c = db.rawQuery("SELECT * FROM contestFalse WHERE id LIKE ? OR name LIKE ? OR phase LIKE ? ",
+                    new String[]{"%" + edit + "%", "%" + edit + "%", "%" + edit + "%"});
+            while (c.moveToNext()) {
+                contestFalse.ResultBean contest = new contestFalse.ResultBean();
+                contest.setId(c.getString(c.getColumnIndex("id")));
+                contest.setName(c.getString(c.getColumnIndex("name")));
+//            contest.setType(c.getString(c.getColumnIndex("type")));
+                contest.setPhase(c.getString(c.getColumnIndex("phase")));
+                contests.add(contest);
+//            Log.d("getdata",c.getString(c.getColumnIndex("id")));
+            }
+            c.close();
+            return contests;
+        }else{
+            return null;
+        }
+
     }
 
     //程序退出时需要调用close()释放数据库资源

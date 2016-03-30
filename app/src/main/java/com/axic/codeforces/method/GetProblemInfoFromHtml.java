@@ -10,6 +10,7 @@ import com.axic.codeforces.fragment.ProblemsDetails;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 
+import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.io.IOException;
@@ -24,6 +25,12 @@ public class GetProblemInfoFromHtml {
 
     String html;
     String url;
+
+    public String getTitle() {
+        return title;
+    }
+
+    String title;
 
 
     public String getHtml() {
@@ -49,11 +56,11 @@ public class GetProblemInfoFromHtml {
         if (doc != null) {
             //获取problem全部数据；
             Elements HTML = doc.select("div.problem-statement");
-
             //获取problem-statement类下的html代码
             html = HTML.html();
             if (html != null) {
                 Log.d("html", html);
+
             } else {
                 Log.d("null", "null");
             }
@@ -70,6 +77,12 @@ public class GetProblemInfoFromHtml {
         return true;
 
     }
+
+
+
+
+
+
 
 /*  可以使用TextView直接将HTML格式的文本直接显示，而且保留格式，非常好用
     //获取problem的头数据

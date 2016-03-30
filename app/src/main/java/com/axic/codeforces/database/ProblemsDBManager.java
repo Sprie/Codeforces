@@ -128,7 +128,7 @@ public class ProblemsDBManager {
             Log.d("cCount", c.getCount() + c.getString(c.getColumnIndex("details")));
 
                 details = c.getString(c.getColumnIndex("details"));
-                Log.d("getfromdb", details+"null");
+                Log.d("getfromdb", details + "null");
 //            }
             c.close();
 
@@ -142,4 +142,37 @@ public class ProblemsDBManager {
         return details;
 
     }
+
+    //search
+    //搜索
+    public List<ProblemsIndex.ResultBean.ProblemsBean> searchDataFromDBByEdit(String edit) {
+        ArrayList<ProblemsIndex.ResultBean.ProblemsBean> problems =
+                new ArrayList<ProblemsIndex.ResultBean.ProblemsBean>();
+        Cursor c = db.rawQuery("SELECT * FROM problems WHERE proIndex LIKE ? OR name LIKE ? OR tags LIKE ? ",
+                new String[]{"%" + edit + "%", "%" + edit + "%","%" + edit + "%"});
+        int tag = c.getCount();
+        Log.d("cCount", c.getCount() + "");
+        if (tag != 0) {
+            while (c.moveToNext()) {
+                ProblemsIndex.ResultBean.ProblemsBean problem =
+                        new ProblemsIndex.ResultBean.ProblemsBean();
+                problem.setContestId(c.getString(c.getColumnIndex("id")));
+                problem.setName(c.getString(c.getColumnIndex("name")));
+                problem.setType(c.getString(c.getColumnIndex("type")));
+                problem.setPoints(c.getString(c.getColumnIndex("points")));
+                problem.setIndex(c.getString(c.getColumnIndex("proIndex")));
+                problem.setStrTags(c.getString(c.getColumnIndex("tags")));
+
+
+                problems.add(problem);
+//            Log.d("getdata",c.getString(c.getColumnIndex("id")));
+            }
+
+            c.close();
+            return problems;
+        } else {
+            return null;
+        }
+    }
+
 }

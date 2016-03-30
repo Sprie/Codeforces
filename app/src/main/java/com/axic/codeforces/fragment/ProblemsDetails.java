@@ -17,6 +17,7 @@ import com.axic.codeforces.R;
 import com.axic.codeforces.database.ProblemsDBManager;
 import com.axic.codeforces.method.CheckNet;
 import com.axic.codeforces.method.GetProblemInfoFromHtml;
+import com.axic.codeforces.method.MyTextView;
 
 
 /**
@@ -34,8 +35,9 @@ public class ProblemsDetails extends Fragment implements SwipeRefreshLayout.OnRe
     private CheckNet checkNet;
     private ProblemsDBManager db;
     private GetProblemInfoFromHtml getProblemInfoFromHtml;
-    String html = "error";
+    private String html = "error";
     boolean status = true;
+
 
 //    private Handler handler = new Handler() {
 //        public void handleMassage(Message msg){
@@ -56,11 +58,22 @@ public class ProblemsDetails extends Fragment implements SwipeRefreshLayout.OnRe
         db = new ProblemsDBManager(getActivity(), 1);
         view = inflater.inflate(R.layout.problemsdetails, container, false);
         tv = (TextView) view.findViewById(R.id.details);
+
         mSwipe = (SwipeRefreshLayout) view.findViewById(R.id.details_swipe);
+        mSwipe.setColorSchemeResources(android.R.color.black);
         mSwipe.setOnRefreshListener(this);
         checkNet = new CheckNet(getActivity());
 
         tv.setText("Loading...");
+
+        tv.setOnLongClickListener(new View.OnLongClickListener() {
+            @Override
+            public boolean onLongClick(View v) {
+
+                Log.d("onLongClick","true");
+                return false;
+            }
+        });
 
         Bundle bundle = getArguments();
         if (bundle != null) {
@@ -118,6 +131,10 @@ public class ProblemsDetails extends Fragment implements SwipeRefreshLayout.OnRe
                     if (status) {
                         Log.d("status", status + "...");
                         html = getProblemInfoFromHtml.getHtml();
+                        //test
+//                        Log.d("header",getProblemInfoFromHtml.getHeaderData());
+
+
                         getActivity().runOnUiThread(new Runnable() {
                             @Override
                             public void run() {
