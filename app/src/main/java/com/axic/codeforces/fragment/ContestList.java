@@ -43,7 +43,6 @@ public class ContestList extends Fragment implements SwipeRefreshLayout.OnRefres
 
     private ContestDBManager db;
     boolean status = true;//第一次运行从net获取数据，之后从数据库获取；
-    boolean dbstatus = true;//第一次运行加入数据库，刷新获取新数据进行比较，不同则更新数据
 
     private CheckNet CheckNet;
 
@@ -168,9 +167,7 @@ public class ContestList extends Fragment implements SwipeRefreshLayout.OnRefres
                         Log.d("datasize", dataSize + "");
                         Log.d("ctListSize", ctList.size() + "");
                         if (ctList.size() > dataSize) {
-//                                dbstatus = true;
                             Log.d("news", "新数据");
-
 
                             for (contestFalse.ResultBean rst : ctList) {
                                 String name = rst.getName();
@@ -193,7 +190,7 @@ public class ContestList extends Fragment implements SwipeRefreshLayout.OnRefres
                             Log.d("getContestData", "FromNet");
 
                             //若不是第一次创建数据库，且数据有更新，则将更新的数据add到数据库
-                            if (!dbstatus) {
+                            if (dataSize!=0) {
 
                                 contestFalse.ResultBean newResult = new contestFalse.ResultBean();
                                 List<contestFalse.ResultBean> newData = new ArrayList<contestFalse.ResultBean>();
@@ -219,11 +216,12 @@ public class ContestList extends Fragment implements SwipeRefreshLayout.OnRefres
 
                             }
 
-                            if (dbstatus) {
+                            //若第一次添加数据，则将数据添加到数据库
+                            if (dataSize==0) {
                                 //添加数据到数据库
+                                Log.d("addDataToDB", "First start add");
                                 db.add(ctList);
-                                dbstatus = false;
-                                Log.d("addDataToDB", "added");
+                                Log.d("addDataToDB", "First added");
                             }
                         } else if (ctList.size() == dataSize) {
                             //判断phase值有没有变化，有变化则更新

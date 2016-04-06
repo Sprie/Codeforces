@@ -91,7 +91,7 @@ public class SearchDataFromDB extends Activity implements View.OnClickListener {
                 if (tags.equals("Tags:")) {
                     String problemsId = map.get("id");
                     String problemsIndex = map.get("index");
-Log.d("start","comming intent");
+                    Log.d("start", "comming intent");
                     //新建一个活动页面，承载problemsDetails内容
                     Intent proIntent = new Intent(SearchDataFromDB.this, ProblemsDetailsActivity.class);
                     proIntent.putExtra("problemsId", problemsId);
@@ -223,11 +223,12 @@ Log.d("start","comming intent");
         ArrayList<HashMap<String, String>> contestList = new ArrayList<HashMap<String, String>>();
 
         if (CTList != null) {
-            if (contestStatus == 0) {
-                HashMap<String, String> map = new HashMap<String, String>();
-                map.put("name", "Contest");
-                contestList.add(map);
-            }
+            //添加表头  但是点击会出现bug，所以删除
+//            if (contestStatus == 0) {
+//                HashMap<String, String> map = new HashMap<String, String>();
+//                map.put("name", "Contest");
+//                contestList.add(map);
+//            }
             for (contestFalse.ResultBean rst : CTList) {
                 String name = rst.getName();
                 String id = rst.getId();
@@ -249,11 +250,11 @@ Log.d("start","comming intent");
 
 
         if (PBList != null) {
-            if (problemsStatus == 0) {
-                HashMap<String, String> map = new HashMap<String, String>();
-                map.put("name", "Problems");
-                contestList.add(map);
-            }
+//            if (problemsStatus == 0) {
+//                HashMap<String, String> map = new HashMap<String, String>();
+//                map.put("name", "Problems");
+//                contestList.add(map);
+//            }
             for (ProblemsIndex.ResultBean.ProblemsBean rst : PBList) {
                 //获取数据库的数据
                 String name = rst.getName();
