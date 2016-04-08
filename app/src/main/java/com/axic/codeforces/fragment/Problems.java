@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.app.Fragment;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.text.Html;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -23,6 +24,7 @@ import com.axic.codeforces.R;
 import com.axic.codeforces.data.ProblemsIndex;
 import com.axic.codeforces.database.ProblemsDBManager;
 import com.axic.codeforces.method.CheckNet;
+import com.axic.codeforces.method.GetProblemsQuestionsInfoFromHtml;
 import com.axic.codeforces.method.GsonRequest;
 
 import java.util.ArrayList;
@@ -53,6 +55,8 @@ public class Problems extends Fragment implements SwipeRefreshLayout.OnRefreshLi
     private CheckNet CheckNet;
 
     private Callbacks mCallbacks;
+
+    private TextView problemsQuestions;
 
     //定义一个回调接口
     public interface Callbacks {
@@ -104,6 +108,8 @@ public class Problems extends Fragment implements SwipeRefreshLayout.OnRefreshLi
 
         showContestId = (TextView) view.findViewById(R.id.contest_id);
         showContestName = (TextView) view.findViewById(R.id.contest_name);
+
+        problemsQuestions = (TextView) view.findViewById(R.id.problem_question);
 
 
         showContestName.setText(contestName);
@@ -268,6 +274,29 @@ public class Problems extends Fragment implements SwipeRefreshLayout.OnRefreshLi
             ));
 
             mQueue.add(GsonRequest);
+            Log.d("new Thread","start111");
+            //添加questions of problems
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    Log.d("new Thread","start");
+                    final String questionsData;
+                    GetProblemsQuestionsInfoFromHtml getData = new GetProblemsQuestionsInfoFromHtml();
+                    if(getData.run(contestId)){
+                        questionsData = getData.getHtml();
+                    }else{
+                        questionsData = "error";
+                    }
+                    getActivity().runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            problemsQuestions.setText(Html.fromHtml(questionsData));
+//                            problemsQuestions.setText("success");
+                        }
+                    });
+                }
+            }).start();
+
         } else {
             getDataFromDB();
             mSwipe.setRefreshing(false);

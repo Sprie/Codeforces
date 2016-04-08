@@ -64,11 +64,11 @@ public class GetProblemInfoFromHtml {
             } else {
                 Log.d("null", "null");
             }
-            Elements image = HTML.select("img[src]");
-            if (image != null) {
-                //若HTML文本中有图片链接，获取该图片
-
-            }
+//            Elements image = HTML.select("img[src]");
+//            if (image != null) {
+//                //若HTML文本中有图片链接，获取该图片
+//
+//            }
 
 
         } else {

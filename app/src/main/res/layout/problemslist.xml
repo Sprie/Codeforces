@@ -7,25 +7,26 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:paddingStart="@dimen/problemsListLittleTitlePadding"
+        android:orientation="horizontal"
         android:paddingEnd="@dimen/problemsListLittleTitlePadding"
-        android:orientation="horizontal">
+        android:paddingStart="@dimen/problemsListLittleTitlePadding">
 
         <TextView
             android:id="@+id/contest_id"
             android:layout_width="0dp"
-            android:layout_weight="1"
             android:layout_height="match_parent"
+            android:layout_weight="1"
             android:gravity="center"
             android:textSize="@dimen/problemsListLittleTitleName" />
+
         <TextView
             android:id="@+id/contest_name"
             android:layout_width="0dp"
-            android:layout_weight="6"
             android:layout_height="wrap_content"
-            android:textSize="@dimen/problemsListLittleTitleName"
+            android:layout_weight="6"
             android:ellipsize="end"
-            android:maxLines="1"/>
+            android:maxLines="1"
+            android:textSize="@dimen/problemsListLittleTitleName" />
     </LinearLayout>
 
     <TextView
@@ -33,14 +34,53 @@
         android:layout_height="1px"
         android:background="#111" />
 
-    <android.support.v4.widget.SwipeRefreshLayout
-        android:id="@+id/problems_swipe"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
 
-        <ListView
-            android:id="@+id/problemslistview"
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="8">
+
+        <android.support.v4.widget.SwipeRefreshLayout
+            android:id="@+id/problems_swipe"
             android:layout_width="match_parent"
-            android:layout_height="match_parent" />
-    </android.support.v4.widget.SwipeRefreshLayout>
+            android:layout_height="wrap_content">
+
+            <ListView
+                android:id="@+id/problemslistview"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content" />
+        </android.support.v4.widget.SwipeRefreshLayout>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:layout_weight="2"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="1px"
+            android:background="#111" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Questions about problems"
+            android:textColor="#aa6541"
+            android:textSize="20sp" />
+
+        <ScrollView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent">
+
+            <TextView
+                android:id="@+id/problem_question"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="text" />
+        </ScrollView>
+    </LinearLayout>
+
+
 </LinearLayout>
