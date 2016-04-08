@@ -22,7 +22,8 @@
                 android:layout_height="wrap_content"
                 android:gravity="center_horizontal"
                 android:textColor="@color/detailsColor"
-                android:textSize="@dimen/details" />
+                android:textSize="@dimen/details"
+                />
         </ScrollView>
     </android.support.v4.widget.SwipeRefreshLayout>
     <!--
