@@ -6,9 +6,12 @@ import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Window;
 
 import com.axic.codeforces.R;
+import com.axic.codeforces.fragment.Home;
+import com.axic.codeforces.fragment.Materials;
 import com.axic.codeforces.fragment.Problems;
 import com.axic.codeforces.fragment.ProblemsDetails;
 
@@ -59,6 +62,25 @@ public class ProblemsListActivity extends Activity
         FragmentTransaction transaction = getFragmentManager().beginTransaction();
 
         transaction.add(R.id.problems_content, detail);
+        transaction.addToBackStack(null);
+        transaction.commit();
+
+//        title = new ProblemListTitle().setTitle(index);
+//        Log.d("index",index);
+//        title.setTitle(index);
+
+
+    }
+    public void getData(String contestId){
+        Log.d("getData id","true" );
+        Bundle data = new Bundle();
+        data.putString("contestId",contestId);
+       Materials materials  = new Materials();
+        materials.setArguments(data);
+
+        FragmentTransaction transaction = getFragmentManager().beginTransaction();
+
+        transaction.add(R.id.problems_content,materials);
         transaction.addToBackStack(null);
         transaction.commit();
 

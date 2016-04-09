@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical">
@@ -8,7 +9,8 @@
         android:id="@+id/problems_title"
         android:name="com.axic.codeforces.fragment.ProblemListTitle"
         android:layout_width="match_parent"
-        android:layout_height="45dp" />
+        android:layout_height="45dp"
+        tools:layout="@layout/problemslisttitle" />
 
     <FrameLayout
         android:id="@+id/problems_content"

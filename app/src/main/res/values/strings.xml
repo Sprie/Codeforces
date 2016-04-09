@@ -3,4 +3,6 @@
     <string name="problemsTitle">Problems</string>
 
     <string name="tags">Tags:</string>
+
+    <string name="Loading">Laoding...Please Wait...</string>
 </resources>

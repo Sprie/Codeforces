@@ -2,6 +2,7 @@ package com.axic.codeforces.fragment;
 
 import android.app.Activity;
 import android.app.Fragment;
+import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.text.Html;
@@ -23,6 +24,7 @@ import com.android.volley.toolbox.Volley;
 import com.axic.codeforces.R;
 import com.axic.codeforces.data.ProblemsIndex;
 import com.axic.codeforces.database.ProblemsDBManager;
+import com.axic.codeforces.database.ProblemsQuestionsDBManager;
 import com.axic.codeforces.method.CheckNet;
 import com.axic.codeforces.method.GetProblemsQuestionsInfoFromHtml;
 import com.axic.codeforces.method.GsonRequest;
@@ -45,10 +47,12 @@ public class Problems extends Fragment implements SwipeRefreshLayout.OnRefreshLi
     private String contestName;
     private String url;
     private SwipeRefreshLayout mSwipe;
+    private Context mContext;
     boolean dbstatus = true;//查看数据库是否有该contest的problems列表，
 
     private ProblemsDBManager db;
-//    private String title;
+    //    private String title;
+    private ProblemsQuestionsDBManager PQdb;
 
     private TextView showContestId;
     private TextView showContestName;
@@ -57,10 +61,17 @@ public class Problems extends Fragment implements SwipeRefreshLayout.OnRefreshLi
     private Callbacks mCallbacks;
 
     private TextView problemsQuestions;
+    private TextView getContestMaterials;
+    private String questionsData;
+
+    private Thread mThread;
+    private boolean mThreadState=true;
 
     //定义一个回调接口
     public interface Callbacks {
-        public void getData(String contestId, String index);
+        void getData(String contestId, String index);
+
+        void getData(String contestId);
     }
 
     ArrayList<HashMap<String, String>> list = new ArrayList<HashMap<String, String>>();
@@ -74,9 +85,11 @@ public class Problems extends Fragment implements SwipeRefreshLayout.OnRefreshLi
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        mContext = getActivity();
+        db = new ProblemsDBManager(mContext, 1);
+        PQdb = new ProblemsQuestionsDBManager(mContext, 1);
+        CheckNet = new CheckNet(mContext);
 
-        db = new ProblemsDBManager(getActivity(), 1);
-        CheckNet = new CheckNet(getActivity());
 
         //获取Activity传来的数据
         final Bundle bundle = getArguments();
@@ -98,7 +111,7 @@ public class Problems extends Fragment implements SwipeRefreshLayout.OnRefreshLi
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
-        mQueue = Volley.newRequestQueue(getActivity());
+        mQueue = Volley.newRequestQueue(mContext);
         view = inflater.inflate(R.layout.problemslist, container, false);
         listView = (ListView) view.findViewById(R.id.problemslistview);
 
@@ -110,6 +123,7 @@ public class Problems extends Fragment implements SwipeRefreshLayout.OnRefreshLi
         showContestName = (TextView) view.findViewById(R.id.contest_name);
 
         problemsQuestions = (TextView) view.findViewById(R.id.problem_question);
+        getContestMaterials = (TextView) view.findViewById(R.id.get_contest_materials);
 
 
         showContestName.setText(contestName);
@@ -133,7 +147,18 @@ public class Problems extends Fragment implements SwipeRefreshLayout.OnRefreshLi
                 mCallbacks.getData(contestId, index);
             }
         });
+        getContestMaterials.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Log.d("getCM", "clicked");
+                Fragment mat = new Materials();
+                Bundle bundle2 = new Bundle();
+                bundle2.putString("contestId", contestId);
+                mat.setArguments(bundle2);
+                mCallbacks.getData(contestId);
 
+            }
+        });
 
         return view;
     }
@@ -147,12 +172,13 @@ public class Problems extends Fragment implements SwipeRefreshLayout.OnRefreshLi
 //            getDataFromDB();
 //        }
         if (CheckNet.haveNet()) {
+            problemsQuestions.setText(R.string.Loading);
 //            list.clear();
 
             getDataFromNet();
 //            mSwipe.setRefreshing(false);
         } else {
-            Toast.makeText(getActivity(), "当前无网络", Toast.LENGTH_LONG).show();
+            Toast.makeText(mContext, "当前无网络", Toast.LENGTH_LONG).show();
             getDataFromDB();
             mSwipe.setRefreshing(false);
         }
@@ -179,17 +205,23 @@ public class Problems extends Fragment implements SwipeRefreshLayout.OnRefreshLi
 //            map.put("points", points);
 //            map.put("type", type);
             map.put("tags", tags);
-            map.put("tag","Tags:");
+            map.put("tag", "Tags:");
 
             problemsList.add(map);
         }
 
-        SimpleAdapter listAdapter = new SimpleAdapter(getActivity(), problemsList, R.layout.poblemslistview,
-                new String[]{"name", "index", "tags","tag"},
-                new int[]{R.id.problemName, R.id.problemIndex, R.id.problemTags,R.id.Tags});
+        SimpleAdapter listAdapter = new SimpleAdapter(mContext, problemsList, R.layout.poblemslistview,
+                new String[]{"name", "index", "tags", "tag"},
+                new int[]{R.id.problemName, R.id.problemIndex, R.id.problemTags, R.id.Tags});
 
         listView.setAdapter(listAdapter);
         Log.d("right", "right");
+
+    }
+
+    private void getQuestionsFromDB() {
+        //从数据库获取ProblemsQuestions数据并显示
+        problemsQuestions.setText(Html.fromHtml(PQdb.getQustions(contestId)));
     }
 
     private void getDataFromNet() {
@@ -238,15 +270,22 @@ public class Problems extends Fragment implements SwipeRefreshLayout.OnRefreshLi
                                 map.put("name", name);
                                 map.put("index", index);
                                 map.put("tags", tags);
-                                map.put("tag","Tags:");
+                                map.put("tag", "Tags:");
 
                                 list.add(map);
                             }
-                            SimpleAdapter listAdapter = new SimpleAdapter(getActivity(), list, R.layout.poblemslistview,
-                                    new String[]{"name", "index", "tags","tag"},
-                                    new int[]{R.id.problemName, R.id.problemIndex, R.id.problemTags,R.id.Tags});
+                            SimpleAdapter listAdapter = new SimpleAdapter(mContext, list, R.layout.poblemslistview,
+                                    new String[]{"name", "index", "tags", "tag"},
+                                    new int[]{R.id.problemName, R.id.problemIndex, R.id.problemTags, R.id.Tags});
 
-                            listView.setAdapter(listAdapter);
+                            //若未退出该页面
+                            if (mThreadState) {
+
+                                listView.setAdapter(listAdapter);
+
+
+                            }
+
 
                             if (dbstatus) {
                                 //添加数据到数据库
@@ -262,7 +301,14 @@ public class Problems extends Fragment implements SwipeRefreshLayout.OnRefreshLi
                 @Override
                 public void onErrorResponse(VolleyError error) {
                     Log.e("TErr", error.getMessage(), error);
-                    Toast.makeText(getActivity(), "服务器正在开小差~请稍候重试 >-<", Toast.LENGTH_LONG).show();
+                    //若未退出该页面
+                    if (mThreadState) {
+
+
+
+                        Toast.makeText(mContext, "服务器正在开小差~请稍候重试 >-<", Toast.LENGTH_LONG).show();
+
+                    }
                     mSwipe.setRefreshing(false);
                 }
             });
@@ -274,38 +320,66 @@ public class Problems extends Fragment implements SwipeRefreshLayout.OnRefreshLi
             ));
 
             mQueue.add(GsonRequest);
-            Log.d("new Thread","start111");
-            //添加questions of problems
-            new Thread(new Runnable() {
-                @Override
-                public void run() {
-                    Log.d("new Thread","start");
-                    final String questionsData;
-                    GetProblemsQuestionsInfoFromHtml getData = new GetProblemsQuestionsInfoFromHtml();
-                    if(getData.run(contestId)){
-                        questionsData = getData.getHtml();
-                    }else{
-                        questionsData = "error";
-                    }
-                    getActivity().runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            problemsQuestions.setText(Html.fromHtml(questionsData));
-//                            problemsQuestions.setText("success");
-                        }
-                    });
-                }
-            }).start();
-
         } else {
             getDataFromDB();
             mSwipe.setRefreshing(false);
         }
+
+        //添加questions of problems
+        if (!PQdb.hasQuestions(contestId)) {
+            mThread = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    Log.d("new Thread", "start");
+//                    final Spanned Htmlque;
+                    GetProblemsQuestionsInfoFromHtml getData = new GetProblemsQuestionsInfoFromHtml();
+                    if (getData.run(contestId)) {
+                        questionsData = getData.getHtml();
+                        Log.d("questionsData", questionsData);
+                        PQdb.addQuestions(contestId, questionsData);
+                    } else {
+                        questionsData = "error";
+                    }
+//                    Htmlque = Html.fromHtml(questionsData);
+//                    Htmlque = Html.fromHtml("<br>2222<br>333<br>");
+                    //若未退出该页面
+                    if (mThreadState) {
+                        getActivity().runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                Log.d("questionsDataOnUI", questionsData);
+                                problemsQuestions.setText(Html.fromHtml(questionsData));
+                            }
+                        });
+
+                    } else {
+                        mThread.interrupt();
+                    }
+
+                }
+            });
+            mThread.start();
+        } else {
+            getQuestionsFromDB();
+        }
+
+
+    }
+
+    public void onPause() {
+        if (mThread != null && mThread.isAlive()) {
+            //Log.e("readCacheThread", "thread interrupt_1");
+            mThreadState = false;
+            //Log.e("status", ""+readCacheThread.isInterrupted());
+        }
+
+        super.onPause();
     }
 
     public void onDestroy() {
 
         super.onDestroy();
+
 //        db.closeDB();
     }
 }

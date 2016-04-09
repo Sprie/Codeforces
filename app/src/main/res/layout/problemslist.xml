@@ -7,6 +7,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:elevation="@dimen/elevation"
         android:orientation="horizontal"
         android:paddingEnd="@dimen/problemsListLittleTitlePadding"
         android:paddingStart="@dimen/problemsListLittleTitlePadding">
@@ -38,7 +39,7 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="8">
+        android:layout_weight="7">
 
         <android.support.v4.widget.SwipeRefreshLayout
             android:id="@+id/problems_swipe"
@@ -55,8 +56,9 @@
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="0dp"
-        android:layout_weight="2"
+        android:layout_weight="3"
         android:orientation="vertical">
+
 
         <TextView
             android:layout_width="match_parent"
@@ -66,7 +68,10 @@
         <TextView
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
             android:text="Questions about problems"
+
+            android:elevation="@dimen/elevation"
             android:textColor="#aa6541"
             android:textSize="20sp" />
 
@@ -77,10 +82,32 @@
             <TextView
                 android:id="@+id/problem_question"
                 android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="text" />
+                android:layout_height="match_parent"
+
+                android:text="@string/Loading" />
         </ScrollView>
+
     </LinearLayout>
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:elevation="@dimen/elevation"
+        android:orientation="vertical">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="1px"
+            android:background="#111" />
+
+        <TextView
+            android:id="@+id/get_contest_materials"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_horizontal"
+            android:text="Get Contest Materials"
+            android:textColor="#168234"
+            android:textSize="@dimen/problemsListName" />
+    </LinearLayout>
 
 </LinearLayout>

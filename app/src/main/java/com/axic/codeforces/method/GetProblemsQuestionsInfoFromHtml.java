@@ -8,6 +8,8 @@ import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
 
 import java.io.IOException;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Created by 59786 on 2016/4/8.
@@ -39,17 +41,45 @@ public class GetProblemsQuestionsInfoFromHtml {
             Element table = HTML.select("table").first();
             Log.d("Table", table.html());
             Elements haveOrNoData = table.select(".question-response");
-            Log.d("check", haveOrNoData.html() + " 0000");
-            if (!haveOrNoData.html().equals("")) {
-                for (Element el : haveOrNoData) {
-                    html = html +
-                            "<p>"+el.html() + "</p>";
-                    Log.d("html", html);
+            //去除table中无用数据
+//            table.cl
 
+            Log.d("check", haveOrNoData.html() + "\n 0000");
+            if (!haveOrNoData.html().equals("")) {
+//                for (Element el : haveOrNoData) {
+//                    html = html +
+//                            el.html() + "\n\n";
+//                    Log.d("html", html);
+//
+//                }
+                html = table.text();
+                Log.d("table", html + "\n1");
+                html = html.replace("# ", "");
+                html = html.replace("Party ", "");
+                html = html.replace("When ", "");
+                html = html.replace("Question ", "");
+                html = html.replace("Answer", "");
+                html = html.replace(" Announcement ", "Announcement<br>");
+                html = html.replace("*****", "<br><font color=\"red\">");
+                //正则表达式
+//
+                Pattern pattern2 = Pattern.compile("20..-..-.. ..:..:..");
+                Matcher matcher2 = pattern2.matcher(html);
+                while (matcher2.find()) {
+                    html = matcher2.replaceAll("</font><br><br>" + matcher2.group() + "<br>");
                 }
+                Pattern pattern = Pattern.compile("</font><br><br>");//括号中为正则表达式
+                Matcher matcher = pattern.matcher(html);//括号中为要匹配的字符串
+                html = matcher.replaceFirst("");
+////
+//                while(matcher.find()){
+//                    html = matcher.replaceAll(matcher.group()+"<br>");
+//                }
+                Log.d("table", html + "\n2");
+//                html = html.replace("<br>","\n");
 
             } else {
-                html = "<p> No questions </p>";
+                html = " No questions \n";
             }
 //            Element s = haveOrNoData.get
 //                Log.d("haveNo", haveOrNoData.html() + "...");
@@ -70,10 +100,10 @@ public class GetProblemsQuestionsInfoFromHtml {
 //
 //            }
 
-
+            return true;
         } else {
             html = "Error";
         }
-        return true;
+        return false;
     }
 }

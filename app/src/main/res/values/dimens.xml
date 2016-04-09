@@ -11,4 +11,6 @@
 
     <dimen name="details">16sp</dimen>
 
+    <dimen name="elevation">5dp</dimen>
+
 </resources>

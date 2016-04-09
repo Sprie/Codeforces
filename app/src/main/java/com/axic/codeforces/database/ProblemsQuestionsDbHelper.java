@@ -18,8 +18,8 @@ public class ProblemsQuestionsDbHelper extends SQLiteOpenHelper {
     public void onCreate(SQLiteDatabase db){
         db.execSQL("CREATE TABLE IF NOT EXISTS problemsQuestion("+
                 "id VARCHAR PRIMARY KEY," +
-                "question TEXT," +
-                "FOREIGN KEY(id) REFERENCES contestFalse(id)"
+                "questions TEXT," +
+                "FOREIGN KEY(id) REFERENCES contestFalse(id))"
                 );
         Log.d("db","数据库创建完成");
         dbStatus = true;

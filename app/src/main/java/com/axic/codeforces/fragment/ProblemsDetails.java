@@ -43,6 +43,8 @@ public class ProblemsDetails extends Fragment implements SwipeRefreshLayout.OnRe
     boolean status = true;
     private float density;
     private float scaledDensity;
+    private Thread mThread;
+    private boolean mThreadState = true;
 
 
 //    private Handler handler = new Handler() {
@@ -84,7 +86,7 @@ public class ProblemsDetails extends Fragment implements SwipeRefreshLayout.OnRe
 //                width + "  "+height+"  "+density+"  "+densityDpi,
 //                Toast.LENGTH_LONG).show();
 
-        tv.setText("Loading...");
+        tv.setText(R.string.Loading);
 
         tv.setOnLongClickListener(new View.OnLongClickListener() {
             @Override
@@ -115,7 +117,7 @@ public class ProblemsDetails extends Fragment implements SwipeRefreshLayout.OnRe
     }
 
     public void onRefresh() {
-        tv.setText("Loading...");
+        tv.setText(R.string.Loading);
 //        getDataFromNet();
 //        mSwipe.setRefreshing(false);
 
@@ -202,7 +204,7 @@ public class ProblemsDetails extends Fragment implements SwipeRefreshLayout.OnRe
 
             Log.d("details", "getFromNet");
             //创建新线程获取ProblemDetails并显示到textView中
-            new Thread(new Runnable() {
+            mThread = new Thread(new Runnable() {
                 @Override
                 public void run() {
                     Log.d("comingNewThread", "coming");
@@ -249,32 +251,47 @@ public class ProblemsDetails extends Fragment implements SwipeRefreshLayout.OnRe
                                 }
                             }
                         }, null);
+                        //若未退出该页面
+                        if (mThreadState) {
 
-                        getActivity().runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                tv.setText(details);
-                                Log.d("In ", "Ui");
-                            }
-                        });
+                            getActivity().runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    tv.setText(details);
+                                    Log.d("In ", "Ui");
+                                }
+                            });
+                            //向数据库添加数据
+                            db.addDetail(html, contestId, index);
+                        } else {
+                            mThread.interrupt();
+                        }
 
-                        //向数据库添加数据
-                        db.addDetail(html, contestId, index);
+
+
                     } else {
                         Log.d("status", status + "--");
-                        getActivity().runOnUiThread(new Runnable() {
-                            @Override
-                            public void run() {
-                                tv.setText("获取失败，请稍后重试");
+                        //若未退出该页面
+                        if (mThreadState) {
+
+                            getActivity().runOnUiThread(new Runnable() {
+                                @Override
+                                public void run() {
+                                    tv.setText("获取失败，请稍后重试");
 
 //                                Toast.makeText(getActivity(),"服务器正在开小差~请稍候重试 >-<",Toast.LENGTH_LONG).show();
-                                Log.d("In ", "Ui");
-                            }
-                        });
+                                    Log.d("In ", "Ui");
+                                }
+                            });
+                        } else {
+                            mThread.interrupt();
+                        }
                     }
                     mSwipe.setRefreshing(false);
                 }
-            }).start();
+            });
+
+            mThread.start();
 
         } else {
             getDataFromDB();
@@ -282,8 +299,19 @@ public class ProblemsDetails extends Fragment implements SwipeRefreshLayout.OnRe
 
     }
 
-    public void onDestroy() {
 
+    public void onPause() {
+        super.onPause();
+        Log.d("problemsDetails", "onPause");
+        if (mThread != null && mThread.isAlive()) {
+            //Log.e("readCacheThread", "thread interrupt_1");
+            mThreadState = false;
+            //Log.e("status", ""+readCacheThread.isInterrupted());
+        }
+    }
+
+    public void onDestroy() {
+        Log.d("problemsDetails", "onDestroy");
         super.onDestroy();
         db.closeDB();
     }

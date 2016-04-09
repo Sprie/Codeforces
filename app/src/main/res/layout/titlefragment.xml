@@ -3,7 +3,8 @@
     android:layout_width="match_parent"
     android:layout_height="45dp"
     android:background="@drawable/titlebar2"
-    android:orientation="vertical">
+    android:orientation="vertical"
+    android:elevation="@dimen/elevation">
 
     <TextView
         android:id="@+id/maintitle"
