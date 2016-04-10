@@ -23,6 +23,7 @@
                 android:gravity="center_horizontal"
                 android:textColor="@color/detailsColor"
                 android:textSize="@dimen/details"
+                android:textIsSelectable="true"
                 />
         </ScrollView>
     </android.support.v4.widget.SwipeRefreshLayout>
