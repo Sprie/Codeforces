@@ -9,19 +9,34 @@ import android.text.Html;
 import android.text.Spanned;
 import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.ActionMode;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.RequestQueue;
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+import com.android.volley.toolbox.Volley;
 import com.axic.codeforces.R;
+import com.axic.codeforces.data.Translate;
 import com.axic.codeforces.database.ProblemsDBManager;
 import com.axic.codeforces.method.CheckNet;
 import com.axic.codeforces.method.GetProblemInfoFromHtml;
+import com.axic.codeforces.method.GsonRequest;
+import com.axic.codeforces.method.TranslateMethod;
+
+import org.apaches.commons.codec.digest.DigestUtils;
 
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.URL;
+import java.util.List;
+import java.util.Random;
 
 
 /**
@@ -49,7 +64,7 @@ public class ProblemsDetails extends Fragment implements SwipeRefreshLayout.OnRe
     int screenWidth;
     int screenHeight;
     Context mContext;
-
+    TranslateMethod translateMethod;
 
 //    private Handler handler = new Handler() {
 //        public void handleMassage(Message msg){
@@ -76,6 +91,7 @@ public class ProblemsDetails extends Fragment implements SwipeRefreshLayout.OnRe
         mSwipe.setColorSchemeResources(android.R.color.black);
         mSwipe.setOnRefreshListener(this);
         checkNet = new CheckNet(mContext);
+        translateMethod = new TranslateMethod(mContext);
 
         //test
         DisplayMetrics metric = new DisplayMetrics();
@@ -87,9 +103,9 @@ public class ProblemsDetails extends Fragment implements SwipeRefreshLayout.OnRe
         scaledDensity = metric.scaledDensity;
 //        Log.d("dpi", width + "  " + height + "  " + density + "  " + densityDpi);
         Log.d("density", density + "");
-        Toast.makeText(mContext,
-                screenWidth + "  " + screenHeight + "  " + density + "  " + densityDpi,
-                Toast.LENGTH_LONG).show();
+//        Toast.makeText(mContext,
+//                screenWidth + "  " + screenHeight + "  " + density + "  " + densityDpi,
+//                Toast.LENGTH_LONG).show();
 
         tv.setText(R.string.Loading);
 
@@ -130,9 +146,76 @@ public class ProblemsDetails extends Fragment implements SwipeRefreshLayout.OnRe
 
         getDataFromNet();
 
+        //长按文本显示菜单
+        tv.setCustomSelectionActionModeCallback(new ActionMode.Callback() {
+            @Override
+            public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+                //Called when action mode is first created The memu supplied
+                //will be used to generate action buttons for the action mode
+
+                //add a option  menu.add(groupId,itemId,order,title);
+                menu.add(0, 1, 0, "Translate");
+                // or you can set icon like menu.add(***).setIcon(R.id.*);
+
+                return true;
+            }
+
+            @Override
+            public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+                //Remove the menu's option
+                menu.removeItem(android.R.id.selectAll);
+                menu.removeItem(android.R.id.cut);
+                menu.removeItem(android.R.id.copy);
+                return true;
+            }
+
+            @Override
+            public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+                switch (item.getItemId()) {
+                    case 1:
+                        int min = 0;
+                        int max = tv.getText().length();
+                        if (tv.isFocusable()) {
+                            final int selStart = tv.getSelectionStart();
+                            final int selEnd = tv.getSelectionEnd();
+
+                            min = Math.max(0, Math.min(selStart, selEnd));
+                            max = Math.max(0, Math.max(selStart, selEnd));
+                        }
+                        // Perform your option with the selected text
+                        final CharSequence selectedText = tv.getText().subSequence(min, max);
+                        // Do some to the selectedText
+                        try {
+                            String str = new String (selectedText.toString().getBytes(),"UTF-8");
+                            translateMethod.getTranslateFromBD(str);
+
+                        Log.d("Translate", "start");
+                        Log.d("Translate", selectedText.toString());
+
+                        Log.d("Translate", "end");
+
+                        } catch (UnsupportedEncodingException e) {
+                            Log.d("String change ", "error");
+                        }
+                        //Finish and close the ActionMode
+                        mode.finish();
+                        return true;
+                    default:
+                        break;
+                }
+                return false;
+            }
+
+            @Override
+            public void onDestroyActionMode(ActionMode mode) {
+                //Called when an action mode is about to be exited and destroyed
+            }
+        });
 
         return view;
     }
+
+
 
     public void onRefresh() {
         tv.setText(R.string.Loading);
@@ -289,16 +372,16 @@ public class ProblemsDetails extends Fragment implements SwipeRefreshLayout.OnRe
         }
         Log.d("hhhh", height + " /// " + scaledDensity);
         if (d.getIntrinsicHeight() < height) {
-            d.setBounds(0, 0, (int) (height*2 / d.getIntrinsicHeight() * d.getIntrinsicWidth()),//因为density是float，而这儿的参数需要int
-                    (int) height*2);//所以强制装换为int
+            d.setBounds(0, 0, (int) (height * 2 / d.getIntrinsicHeight() * d.getIntrinsicWidth()),//因为density是float，而这儿的参数需要int
+                    (int) height * 2);//所以强制装换为int
         } else {
             Log.d("density", density + "");
             if (density >= 3.0) {
                 int width, h;
-                if ((int) (d.getIntrinsicWidth() * density * 3) > screenWidth-20) {
+                if ((int) (d.getIntrinsicWidth() * density * 3) > screenWidth - 20) {
                     Log.d("small screen", "fill width");
-                    width = screenWidth-20;
-                    h = width * d.getIntrinsicHeight()/ d.getIntrinsicWidth() ;
+                    width = screenWidth - 20;
+                    h = width * d.getIntrinsicHeight() / d.getIntrinsicWidth();
                     d.setBounds(0, 0, width, h);//所以强制装换为int
                     Log.d("changedHW", width + " / / " + h);
                 } else {
@@ -334,14 +417,15 @@ public class ProblemsDetails extends Fragment implements SwipeRefreshLayout.OnRe
     public void onPause() {
         super.onPause();
         Log.d("problemsDetails", "onPause");
+
+    }
+
+    public void onDestroy() {
         if (mThread != null && mThread.isAlive()) {
             //Log.e("readCacheThread", "thread interrupt_1");
             mThreadState = false;
             //Log.e("status", ""+readCacheThread.isInterrupted());
         }
-    }
-
-    public void onDestroy() {
         Log.d("problemsDetails", "onDestroy");
         super.onDestroy();
         db.closeDB();

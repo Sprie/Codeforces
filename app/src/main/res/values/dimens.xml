@@ -13,4 +13,7 @@
 
     <dimen name="elevation">5dp</dimen>
 
+    <dimen name="dialogPadingBig">3dp</dimen>
+    <dimen name="dialogPadingSmall">5dp</dimen>
+
 </resources>

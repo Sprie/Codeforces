@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical">
+
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="@dimen/dialogPadingSmall"
+        android:text="Select String:"
+        android:textSize="@dimen/details" />
+
+    <TextView
+        android:id="@+id/trans_source"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="@dimen/dialogPadingBig"
+        android:textColor="@color/tagsColor"
+        android:textSize="20sp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="2px"
+        android:orientation="vertical"
+        android:paddingEnd="@dimen/dialogPadingSmall"
+        android:paddingLeft="@dimen/dialogPadingSmall"
+        android:paddingRight="@dimen/dialogPadingSmall"
+        android:paddingStart="@dimen/dialogPadingSmall">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#111" />
+    </LinearLayout>
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="@dimen/dialogPadingSmall"
+        android:text="translation result:"
+        android:textSize="@dimen/details" />
+
+    <TextView
+        android:id="@+id/trans_dst"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:padding="@dimen/dialogPadingBig"
+        android:textColor="@color/tagsColor"
+        android:textSize="20sp" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="2px"
+        android:orientation="vertical"
+        android:paddingEnd="@dimen/dialogPadingSmall"
+        android:paddingLeft="@dimen/dialogPadingSmall"
+        android:paddingRight="@dimen/dialogPadingSmall"
+        android:paddingStart="@dimen/dialogPadingSmall">
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:background="#111" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content">
+
+        <Button
+            android:id="@+id/trans_back"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Back" />
+
+        <Button
+            android:id="@+id/trans_add"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:text="Add" />
+    </LinearLayout>
+</LinearLayout>

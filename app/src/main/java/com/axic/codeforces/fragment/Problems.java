@@ -7,7 +7,10 @@ import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.text.Html;
 import android.util.Log;
+import android.view.ActionMode;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
@@ -157,6 +160,60 @@ public class Problems extends Fragment implements SwipeRefreshLayout.OnRefreshLi
                 mat.setArguments(bundle2);
                 mCallbacks.getData(contestId);
 
+            }
+        });
+        //Questions 的textView的长按复制翻译
+        problemsQuestions.setCustomSelectionActionModeCallback(new ActionMode.Callback() {
+            @Override
+            public boolean onCreateActionMode(ActionMode mode, Menu menu) {
+                //Called when action mode is first created The memu supplied
+                //will be used to generate action buttons for the action mode
+
+                //add a option  menu.add(groupId,itemId,order,title);
+                menu.add(0, 1, 0, "Translate");
+                // or you can set icon like menu.add(***).setIcon(R.id.*);
+
+                return true;
+            }
+
+            @Override
+            public boolean onPrepareActionMode(ActionMode mode, Menu menu) {
+                //Remove the menu's option
+//                menu.removeItem(android.R.id.selectAll);
+                menu.removeItem(android.R.id.cut);
+//                menu.removeItem(android.R.id.copy);
+                return true;
+            }
+
+            @Override
+            public boolean onActionItemClicked(ActionMode mode, MenuItem item) {
+                switch (item.getItemId()) {
+                    case 1:
+                        int min = 0;
+                        int max = problemsQuestions.getText().length();
+                        if (problemsQuestions.isFocusable()) {
+                            final int selStart =problemsQuestions.getSelectionStart();
+                            final int selEnd = problemsQuestions.getSelectionEnd();
+
+                            min = Math.max(0, Math.min(selStart, selEnd));
+                            max = Math.max(0, Math.max(selStart, selEnd));
+                        }
+                        // Perform your option with the selected text
+                        final CharSequence selectedText = problemsQuestions.getText().subSequence(min, max);
+                        // Do some to the selectedText
+                        Toast.makeText(mContext,selectedText,Toast.LENGTH_LONG).show();
+                        //Finish and close the ActionMode
+                        mode.finish();
+                        return true;
+                    default:
+                        break;
+                }
+                return false;
+            }
+
+            @Override
+            public void onDestroyActionMode(ActionMode mode) {
+                //Called when an action mode is about to be exited and destroyed
             }
         });
 
