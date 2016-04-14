@@ -93,7 +93,7 @@ public class ProblemsDetails extends Fragment implements SwipeRefreshLayout.OnRe
         checkNet = new CheckNet(mContext);
         translateMethod = new TranslateMethod(mContext);
 
-        //test
+        //获得屏幕数据
         DisplayMetrics metric = new DisplayMetrics();
         getActivity().getWindowManager().getDefaultDisplay().getMetrics(metric);
         screenWidth = metric.widthPixels;  // 屏幕宽度（像素）
@@ -363,7 +363,7 @@ public class ProblemsDetails extends Fragment implements SwipeRefreshLayout.OnRe
     }
 
     //屏幕适配
-    private Drawable screenAdaptation(Drawable d) {
+    public Drawable screenAdaptation(Drawable d) {
         float height;
         if (density >= 3) {
             height = 10 * scaledDensity + 0.5f;

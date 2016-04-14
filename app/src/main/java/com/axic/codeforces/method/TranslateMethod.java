@@ -2,6 +2,10 @@ package com.axic.codeforces.method;
 
 import android.content.Context;
 import android.util.Log;
+import android.view.Display;
+import android.view.Gravity;
+import android.view.Window;
+import android.view.WindowManager;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -23,9 +27,13 @@ import java.util.Random;
 public class TranslateMethod {
 
     private Context context;
+    private int height;
+    private int width;
 
     public TranslateMethod(Context context) {
         this.context = context;
+        this.height = height;
+        this.width = width;
     }
 
     String src = "apple";
@@ -62,7 +70,8 @@ public class TranslateMethod {
                         List<Translate.TransResultBean> trans = translate.getTrans_result();
                         String src = "null", dst = "null";
 
-                        if (trans != null) {Log.d("size",trans.size()+"...");
+                        if (trans != null) {
+                            Log.d("size", trans.size() + "...");
                             for (Translate.TransResultBean tr : trans) {
                                 src = tr.getSrc();
                                 dst = tr.getDst();
@@ -71,7 +80,26 @@ public class TranslateMethod {
                             }
                             //显示在屏幕上
 //                            Toast.makeText(context, src + "\n" + dst, Toast.LENGTH_LONG).show();
-                            MyDialog myDialog = new MyDialog(context,src,dst);
+                            MyDialog myDialog = new MyDialog(context, src, dst);
+                            /*
+                             * 获取窗口对象及参数对象以修改对话框的布局设置,
+                             * 可以直接调用getWindow(),表示获得这个Activity的Window
+                             * 对象,这样这可以以同样的方式改变这个Activity的属性.
+                             */
+//                            Window dialogWindow = myDialog.getWindow();
+//                            WindowManager.LayoutParams lp = dialogWindow.getAttributes();
+////                            dialogWindow.setGravity(Gravity.LEFT | Gravity.TOP);
+//                            /*
+//                             * 将对话框的大小按屏幕大小的百分比设置
+//                             */
+////                            WindowManager m = context.getWindowManager();
+////                            Display d = m.getDefaultDisplay(); // 获取屏幕宽、高用
+//                            WindowManager.LayoutParams p = dialogWindow.getAttributes(); // 获取对话框当前的参数值
+//                            p.height = (int) (height * 0.6); // 高度设置为屏幕的0.6
+//                            p.width = (int) (width * 0.8); // 宽度设置为屏幕的0.65
+//                            dialogWindow.setAttributes(p);
+
+
                             myDialog.show();
                         } else {
                             Toast.makeText(context, "Error Select,please don't select null line and specific char.", Toast.LENGTH_LONG).show();
@@ -81,7 +109,7 @@ public class TranslateMethod {
             @Override
             public void onErrorResponse(VolleyError error) {
                 Log.e("TAGeee", error.getMessage(), error);
-                Toast.makeText(context,"Error select,please don't select null line and specific char.",Toast.LENGTH_LONG).show();
+                Toast.makeText(context, "Error select,please don't select null line and specific char.", Toast.LENGTH_LONG).show();
             }
         });
         mQueue.add(gsonRequest);

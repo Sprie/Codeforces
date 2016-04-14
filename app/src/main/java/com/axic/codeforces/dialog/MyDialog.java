@@ -4,6 +4,7 @@ import android.app.Dialog;
 import android.content.Context;
 import android.os.Bundle;
 import android.view.View;
+import android.view.Window;
 import android.widget.Button;
 import android.widget.TextView;
 
@@ -28,8 +29,8 @@ public class MyDialog extends Dialog implements View.OnClickListener{
 
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.dialog);
-        setTitle("Translate");
         transSource = (TextView) findViewById(R.id.trans_source);
         transDst = (TextView) findViewById(R.id.trans_dst);
         transSource.setText(source);

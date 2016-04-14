@@ -1,13 +1,23 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    android:background="#d4d3d4"
+    android:orientation="vertical">
 
     <TextView
         android:layout_width="match_parent"
+        android:layout_height="@dimen/spaceoftextview" />
+
+    <TextView
+
+        android:id="@+id/about_app"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="About App"
+        android:background="@color/detailsBackgroundColor"
         android:elevation="3dp"
-        android:textSize="20sp"/>
+        android:text="About App"
+        android:paddingLeft="@dimen/dialogPadingBig"
+        android:textSize="@dimen/problemsListLittleTitleName" />
 
 </LinearLayout>

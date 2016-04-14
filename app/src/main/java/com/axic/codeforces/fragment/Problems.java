@@ -6,6 +6,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.text.Html;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.ActionMode;
 import android.view.LayoutInflater;
@@ -31,7 +32,9 @@ import com.axic.codeforces.database.ProblemsQuestionsDBManager;
 import com.axic.codeforces.method.CheckNet;
 import com.axic.codeforces.method.GetProblemsQuestionsInfoFromHtml;
 import com.axic.codeforces.method.GsonRequest;
+import com.axic.codeforces.method.TranslateMethod;
 
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -69,6 +72,7 @@ public class Problems extends Fragment implements SwipeRefreshLayout.OnRefreshLi
 
     private Thread mThread;
     private boolean mThreadState=true;
+    private TranslateMethod translateMethod;
 
     //定义一个回调接口
     public interface Callbacks {
@@ -92,6 +96,7 @@ public class Problems extends Fragment implements SwipeRefreshLayout.OnRefreshLi
         db = new ProblemsDBManager(mContext, 1);
         PQdb = new ProblemsQuestionsDBManager(mContext, 1);
         CheckNet = new CheckNet(mContext);
+        translateMethod = new TranslateMethod(mContext);
 
 
         //获取Activity传来的数据
@@ -201,7 +206,18 @@ public class Problems extends Fragment implements SwipeRefreshLayout.OnRefreshLi
                         // Perform your option with the selected text
                         final CharSequence selectedText = problemsQuestions.getText().subSequence(min, max);
                         // Do some to the selectedText
-                        Toast.makeText(mContext,selectedText,Toast.LENGTH_LONG).show();
+                        try {
+                            String str = new String (selectedText.toString().getBytes(),"UTF-8");
+                            translateMethod.getTranslateFromBD(str);
+
+                            Log.d("Translate", "start");
+                            Log.d("Translate", selectedText.toString());
+
+                            Log.d("Translate", "end");
+
+                        } catch (UnsupportedEncodingException e) {
+                            Log.d("String change ", "error");
+                        }
                         //Finish and close the ActionMode
                         mode.finish();
                         return true;

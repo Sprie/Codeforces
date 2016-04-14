@@ -3,6 +3,8 @@
     <dimen name="activity_horizontal_margin">16dp</dimen>
     <dimen name="activity_vertical_margin">16dp</dimen>
 
+    <dimen name="titleHight">45dp</dimen>
+
     <dimen name="allTitleName">26sp</dimen>
     <dimen name="problemsListLittleTitleName">24sp</dimen>
     <dimen name="problemsListLittleTitlePadding">12dp</dimen>
@@ -15,5 +17,7 @@
 
     <dimen name="dialogPadingBig">3dp</dimen>
     <dimen name="dialogPadingSmall">5dp</dimen>
+    
+    <dimen name="spaceoftextview">10dp</dimen>
 
 </resources>
